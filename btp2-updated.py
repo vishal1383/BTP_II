@@ -189,14 +189,14 @@ def ECT(emb,E_plus,E_minus,neutral_list_words):
     sim1= []
     sim2=[]
     for word in neutral_list_words:
-        try:
-            sim1.append(1-cosine1(vec_plus,emb[word]))
-            sim2.append(1-cosine1(vec_minus,emb[word]))
-        except:
-            pass
+        if word not in vec_plus.keys() or word not in vec_plus.keys():
+            continue
+        sim1.append(1-cosine1(vec_plus,emb[word]))
+        sim2.append(1-cosine1(vec_minus,emb[word]))
+        
     return spearmanr(sim1, sim2)
 
-def new2(emb,E_plus,E_minus,neutral_list_words, epsilon):
+def overlap_epsilon_metric(emb,E_plus,E_minus,neutral_list_words, epsilon):
     def overlap(alpha, beta, epsilon):
         if(abs(alpha-beta)<2*epsilon):
             t = min(alpha, beta)
@@ -223,7 +223,7 @@ def new2(emb,E_plus,E_minus,neutral_list_words, epsilon):
     return sum(sim)/len(sim)
 
 
-def new3(emb, E_plus, E_minus, neutral_list_words):
+def distance_between_distributions(emb, E_plus, E_minus, neutral_list_words):
     vec_plus,vec_minus=np.array([0]*300,dtype=np.float),np.array([0]*300,dtype=np.float)
     for e in E_plus:
         vec_plus+=emb[e]     
@@ -426,7 +426,7 @@ def run_tests(embeddings_list, K_GENDER):
 
     # ECT is actually mode-ect
     # Ignore mod-ect func
-    # new2 is overlap approach
+    # overlap_epsilon_metric is overlap approach
     
     K_MOD_ECT = 5
     EPSILON = 0.2
@@ -441,10 +441,10 @@ def run_tests(embeddings_list, K_GENDER):
                 print(#ECT(embeddings[embedding], es[e][0], es[e][1], tests[test])[0],
                       #mod_ECT(embeddings[embedding], es[e][0], es[e][1], tests[test])[0],
                       #new1(embeddings[embedding], es[e][0], es[e][1], tests[test], K_MOD_ECT)[0]),
-                      new2(embeddings[embedding], es[e][0], es[e][1], tests[test], EPSILON), 
+                      overlap_epsilon_metric(embeddings[embedding], es[e][0], es[e][1], tests[test], EPSILON), 
                       end=' '
                 )
-                # print("here: new3",new3(embeddings[embedding], es[e][0], es[e][1], tests[test]))
+                # print("here: distance_between_distributions",distance_between_distributions(embeddings[embedding], es[e][0], es[e][1], tests[test]))
 
 if __name__=="__main__":
     
